@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Корзина</title>
+</head>
+<body style="text-align:center; padding:40px">
+    <h2>Товары в корзине</h2>
+    {% for item in items %}
+        <div>
+            <h4><a href="\./item/{{item.id}}/">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
+        </div>
+    {% endfor %}
+    <a href="">Оформить заказ</a>
+    <form method="get" action="{% url 'basket' %}" style="margin: 10px">
+        <button type="submit" value="basket_clear" name="to_do">Очистить корзину</button>
+    </form>
+</body>
+</html>

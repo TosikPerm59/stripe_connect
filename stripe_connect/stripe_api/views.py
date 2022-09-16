@@ -5,6 +5,9 @@ from .models import Item, Order
 
 
 def basket(request):
+    if request.GET.get('to_do') == 'basket_clear':
+        request.session['basket'] = []
+        return HttpResponse('Ваша корзина очищена')
     if 'basket' not in request.session.keys():
         return HttpResponse('Ваша корзина пуста')
     else:
@@ -15,7 +18,7 @@ def basket(request):
         else:
             for item_id in item_id_list:
                 items.append(Item.objects.get(id=item_id))
-        return render(request, )
+        return render(request, 'stripe_api/basket.html', {'items': items})
 
 
     # order = None
