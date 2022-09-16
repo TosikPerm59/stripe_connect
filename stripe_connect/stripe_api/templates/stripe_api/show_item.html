@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Демонстрация товара</title>
+</head>
+<body style="text-align:center; padding:40px">
+    <div>
+        <h1>{{item.name}}</h1>
+        <br>
+        <h3>Описание товара:</h3>
+        <p>{{item.description}}</p>
+        <br>
+        <h3>Цена товара:</h3>
+        <p>{{item.price}} {{item.currency}}</p>
+    </div>
+    <form action="{% url 'buy' %}" method="get" style="margin: 10px">
+        <button type="submit" value="{{item.id}}" name="item_id">Купить</button>
+    </form>
+    <form action="{% url 'add' %}" method="get">
+        <button type="submit" value="{{item.id}}" name="item_id" style="margin:10px">Добавить в корзину</button>
+    </form>
+    <a href="{% url 'basket' %}"><strong>Перейти в корзину</strong></a>
+</body>
+</html>
