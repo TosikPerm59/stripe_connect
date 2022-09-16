@@ -1,9 +1,10 @@
 from django.contrib import admin
-from models import Item, Order
+from .models import Item, Order
 
 
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'currency', 'price')
+
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('session', 'basket')
