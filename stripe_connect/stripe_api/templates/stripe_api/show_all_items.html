@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Все товары</title>
+</head>
+<header><h2 style="margin: 35px">Все товары</h2></header>
+<body style="text-align:center; padding:40px">
+    {% for item in items %}
+        <div>
+            <h4><a href="\./item/{{item.id}}/">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
+        </div>
+    {% endfor %}
+</body>
+</html>

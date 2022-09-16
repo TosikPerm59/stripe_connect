@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <title>Корзина</title>
 </head>
+<header><a href="{% url 'show_all_items' %}">Показать все товары</a> </header>
 <body style="text-align:center; padding:40px">
-    <h2>Товары в корзине</h2>
+    <h2 style="margin:35px">Товары в корзине</h2>
     {% for item in items %}
         <div>
-            <h4><a href="\./item/{{item.id}}/">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
+            <h4><a href="\./item/{{item.id}}/" style="text-decoration: none">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
         </div>
     {% endfor %}
     <a href="">Оформить заказ</a>

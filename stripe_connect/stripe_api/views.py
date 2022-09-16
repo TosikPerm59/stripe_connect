@@ -4,6 +4,11 @@ from django.http import HttpResponse
 from .models import Item, Order
 
 
+def show_all_items(request):
+    items = Item.objects.all()
+    return render(request, 'stripe_api/show_all_items.html', {'items': items})
+
+
 def basket(request):
     if request.GET.get('to_do') == 'basket_clear':
         request.session['basket'] = []
@@ -43,7 +48,8 @@ def stripe_payment_intent(request):
 def add_to_basket(request):
     item_id = request.GET.get('item_id')
     item = Item.objects.get(id=item_id)
-    print(request.session.keys())
+    auth_user_hash = request.session['_auth_user_hash']
+    print(request.session.items())
     if 'basket' not in request.session.keys():
         print('BASKET')
         request.session['basket'] = [set()]
