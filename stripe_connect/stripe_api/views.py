@@ -4,11 +4,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from .models import Item, Order
-from .functions import get_or_create_session_key, get_item_id, get_order
+from .functions import get_or_create_session_key, get_item_id, get_order, payment_intent_create
 
 
 def show_item(request, item_id):
-    session_key = get_or_create_session_key(request.session)
     item = Item.objects.get(id=item_id)
     return render(request, 'stripe_api/show_item.html', {'item': item})
 
@@ -67,13 +66,15 @@ def add_to_basket(request):
 
 
 def buy(request):
+    item = None
     item_id = get_item_id(request)
+    session_key = get_or_create_session_key(request.session)
 
     if item_id:
-        pass
-    session_key = get_or_create_session_key(request.session())
+        item = Item.objects.get(id=item_id)
+
     if 'paiment_intent' not in request.session.keys():
-        pass
-        # payment_intent = payment_intent_create()
+        payment_intent = payment_intent_create(item.price, item.currency)
+        request.session['payment_intent'] = payment_intent
 
 
