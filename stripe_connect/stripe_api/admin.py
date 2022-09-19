@@ -3,11 +3,11 @@ from .models import Item, Order
 
 
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'currency', 'price')
+    list_display = ('name', 'description', 'price', 'currency')
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('session', 'basket')
+    list_display = ('session_key', 'user_basket')
 
 
 admin.site.register(Item, ItemAdmin)

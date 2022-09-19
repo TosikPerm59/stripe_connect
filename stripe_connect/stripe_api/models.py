@@ -23,8 +23,8 @@ class Item(models.Model):
 
 
 class Order(models.Model):
-    auth_user_hash = models.CharField(max_length=30, verbose_name='Сессия')
-    basket = models.CharField(max_length=100, verbose_name='Корзина для сессии', null=True, blank=True)
+    session_key = models.CharField(max_length=30, verbose_name='Сессия')
+    user_basket = models.CharField(max_length=100, verbose_name='Корзина для сессии', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Корзина для сессии'

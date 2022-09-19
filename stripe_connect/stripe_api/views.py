@@ -1,20 +1,37 @@
+from django.contrib.auth import login
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from django.contrib.sessions.models import Session
 from .models import Item, Order
 
 
 def show_all_items(request):
     items = Item.objects.all()
+
     return render(request, 'stripe_api/show_all_items.html', {'items': items})
 
 
 def basket(request):
+    order = None
+    session_key = request.session.session_key
+    if session_key:
+
+        try:
+            order = Order.objects.get(session_key=session_key)
+        except:
+            pass
+
     if request.GET.get('to_do') == 'basket_clear':
         request.session['basket'] = []
+        request.session.save()
+        if order:
+            order.user_basket = []
+            order.save()
         return HttpResponse('Ваша корзина очищена')
-    if 'basket' not in request.session.keys():
+
+    if 'basket' not in request.session.keys() or request.session['basket'] == []:
         return HttpResponse('Ваша корзина пуста')
+
     else:
         item_id_list = request.session['basket']
         items = []
@@ -26,18 +43,8 @@ def basket(request):
         return render(request, 'stripe_api/basket.html', {'items': items})
 
 
-    # order = None
-    # if request.method == 'GET':
-    #     item_id = request.GET.get('item_id')
-    #     items = Item.objects.get(id='item_id')
-    # else:
-    #     if order:
-    #         pass
-
-
 def show_item(request, item_id):
     item = Item.objects.get(id=item_id)
-    print(type(item))
     return render(request, 'stripe_api/show_item.html', {'item': item})
 
 
@@ -46,21 +53,39 @@ def stripe_payment_intent(request):
 
 
 def add_to_basket(request):
-    item_id = request.GET.get('item_id')
-    item = Item.objects.get(id=item_id)
-    auth_user_hash = request.session['_auth_user_hash']
-    print(request.session.items())
-    if 'basket' not in request.session.keys():
-        print('BASKET')
-        request.session['basket'] = [set()]
-        if item_id not in request.session['basket']:
-            request.session['basket'].append(item_id)
-    else:
-        print('NONE')
+    item_id, order, item = None, None, None
+    session_key = request.session.session_key
 
+
+    if not session_key:
+        request.session.create()
+        request.session['basket'] = []
+        request.session.save()
+    else:
+        if 'basket' not in request.session.keys():
+            request.session['basket'] = []
+
+    try:
+        order = Order.objects.get(session_key=session_key)
+    except:
+        pass
+
+    if not order:
+        order = Order()
+        order.session_key = session_key
+        order.user_basket = request.session['basket']
+
+    try:
+        item_id = request.GET.get('item_id')
+    except:
+        pass
+
+    if item_id:
         if item_id not in request.session['basket']:
-            print('item_id not in request.session[basket]')
             request.session['basket'].append(item_id)
-    request.session.save()
-    print(request.session['basket'])
+            request.session.save()
+            order.user_basket = request.session['basket']
+            order.save()
+        item = Item.objects.get(id=item_id)
+
     return render(request, 'stripe_api/show_item.html', {'item': item})
