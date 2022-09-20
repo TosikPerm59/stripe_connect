@@ -95,6 +95,7 @@ def buy(request):
                         }]
     else:
         items_id = request.session['basket']
+        session_key = get_or_create_session_key(request.session)
         try:
             currency = request.GET.get('currency_radio')
         except:
@@ -126,6 +127,10 @@ def buy(request):
         success_url='https://example.com/success',
         cancel_url='https://example.com/cancel',
     )
+
+    order = get_order(session_key)
+    order.user_basket = []
+    order.save()
 
     return redirect(session.url, code=303)
 
