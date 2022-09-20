@@ -15,7 +15,7 @@
         <h3>Цена товара:</h3>
         <p>{{item.price}} {{item.currency}}</p>
     </div>
-    <form action="" method="get" style="margin: 10px">
+    <form action="{% url 'buy' %}" method="get" style="margin: 10px">
         <button type="submit" value="{{item.id}}" name="item_id">Купить</button>
     </form>
     <form action="{% url 'add' %}" method="get">

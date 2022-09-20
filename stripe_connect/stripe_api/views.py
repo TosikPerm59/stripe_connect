@@ -1,10 +1,10 @@
 import stripe
 from django.contrib.auth import login
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.sessions.models import Session
 from .models import Item, Order
-from .functions import get_or_create_session_key, get_item_id, get_order, payment_intent_create
+from .functions import get_or_create_session_key, get_item_id, get_order
 
 
 def show_item(request, item_id):
@@ -21,6 +21,8 @@ def show_all_items(request):
 def basket(request):
     session_key = get_or_create_session_key(request.session)
     order = get_order(session_key)
+    different_currency = False
+    currency_set = set()
 
     if request.GET.get('to_do') == 'basket_clear':
         request.session['basket'] = []
@@ -38,9 +40,19 @@ def basket(request):
         items = []
 
         for item_id in item_id_list:
-            items.append(Item.objects.get(id=item_id))
+            item = Item.objects.get(id=item_id)
+            currency_set.add(item.currency)
+            items.append(item)
 
-        return render(request, 'stripe_api/basket.html', {'items': items})
+        if len(currency_set) > 1:
+            different_currency = True
+
+        context = {
+            'items': items,
+            'different_currency': different_currency
+        }
+
+        return render(request, 'stripe_api/basket.html', context=context)
 
 
 def add_to_basket(request):
@@ -66,15 +78,56 @@ def add_to_basket(request):
 
 
 def buy(request):
-    item = None
+    item, currency, line_items = None, None, []
+    stripe.api_key = 'sk_test_51LgWe1IcEHFmfMmMy3TylDyqK3YSwRXbSbfpRfSPmr0R6S1KZo09gDvg9Zk1ubrFxxG8GYP6dxxr1Cekp1kRvs0c004HDP1L5O'
     item_id = get_item_id(request)
-    session_key = get_or_create_session_key(request.session)
+
 
     if item_id:
         item = Item.objects.get(id=item_id)
+        line_items = [{
+                        'price_data': {
+                                        'currency': item.currency,
+                                        'product_data': {'name': item.name},
+                                        'unit_amount': int(item.price * 100),
+                                        },
+                        'quantity': 1,
+                        }]
+    else:
+        items_id = request.session['basket']
+        try:
+            currency = request.GET.get('currency_radio')
+        except:
+            pass
 
-    if 'paiment_intent' not in request.session.keys():
-        payment_intent = payment_intent_create(item.price, item.currency)
-        request.session['payment_intent'] = payment_intent
+        for item_id in items_id:
+            item = Item.objects.get(id=item_id)
+            if currency:
+                if item.currency != currency:
+                    if item.currency == 'rub':
+                        item.price = item.price / 60
+                        item.currency = currency
+                    else:
+                        item.price = item.price * 60
+                        item.currency = currency
+            line_item = {
+                        'price_data': {
+                                        'currency': item.currency,
+                                        'product_data': {'name': item.name},
+                                        'unit_amount': int(item.price * 100),
+                                        },
+                        'quantity': 1,
+                        }
+            line_items.append(line_item)
+
+    session = stripe.checkout.Session.create(
+        line_items=line_items,
+        mode='payment',
+        success_url='https://example.com/success',
+        cancel_url='https://example.com/cancel',
+    )
+
+    return redirect(session.url, code=303)
+
 
 

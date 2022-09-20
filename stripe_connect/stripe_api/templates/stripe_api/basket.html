@@ -12,8 +12,18 @@
             <h4><a href="\./item/{{item.id}}/" style="text-decoration: none">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
         </div>
     {% endfor %}
-    <a href="">Оформить заказ</a>
-    <form method="get" action="{% url 'basket' %}" style="margin: 10px">
+    <form action="{% url 'buy' %}" method="get" style="margin-top:50px">
+        {% if different_currency == True %}
+            <h4>Какой валютой будете оплачивать?</h4>
+            <label for="radio_usd">USD</label>
+            <input type="radio" name="currency_radio" checked value="usd" id="radio_usd">
+            <label for="radio_rub">RUB</label>
+            <input type="radio" name="currency_radio" value="rub" id="radio_rub">
+        {% endif %}
+        <br>
+        <button type="submit" style="margin:15px">Оформить заказ</button>
+    </form>
+    <form method="get" action="{% url 'basket' %}">
         <button type="submit" value="basket_clear" name="to_do">Очистить корзину</button>
     </form>
 </body>
