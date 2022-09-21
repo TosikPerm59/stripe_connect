@@ -78,7 +78,7 @@ def add_to_basket(request):
 
 
 def buy(request):
-    item, currency, line_items = None, None, []
+    item, currency, line_items, session_key = None, None, [], None
     stripe.api_key = 'sk_test_51LgWe1IcEHFmfMmMy3TylDyqK3YSwRXbSbfpRfSPmr0R6S1KZo09gDvg9Zk1ubrFxxG8GYP6dxxr1Cekp1kRvs0c004HDP1L5O'
     item_id = get_item_id(request)
 
@@ -129,8 +129,9 @@ def buy(request):
     )
 
     order = get_order(session_key)
-    order.user_basket = []
-    order.save()
+    if order:
+        order.user_basket = []
+        order.save()
 
     return redirect(session.url, code=303)
 
