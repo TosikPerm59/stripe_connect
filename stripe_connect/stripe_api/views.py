@@ -30,7 +30,7 @@ def basket(request):
         if order:
             order.user_basket = []
             order.save()
-        return HttpResponse('Ваша корзина очищена')
+        return show_all_items(request)
 
     if 'basket' not in request.session.keys() or request.session['basket'] == []:
         return HttpResponse('Ваша корзина пуста')

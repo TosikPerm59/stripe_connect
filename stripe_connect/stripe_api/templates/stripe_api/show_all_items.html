@@ -11,5 +11,7 @@
             <h4><a href="\./item/{{item.id}}/">{{ item.name }}</a> --- {{ item.price }} {{ item.currency }}</h4>
         </div>
     {% endfor %}
+    <br>
+    <a href="{% url 'basket' %}"><strong>Перейти в корзину</strong></a>
 </body>
 </html>
